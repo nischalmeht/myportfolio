@@ -3,15 +3,21 @@ import './About.scss';
 import { motion } from 'framer-motion';
 import { images } from '../../constants';
 import { urlFor, client } from '../../client';
+import { AppWrapper } from '../wrapper';
 
 
 const About = () => {
   const [about, setabout] = useState([]);
   useEffect(() => {
+    let isMounted = true
     const query = '*[_type == "abouts"]'
     client.fetch(query).then(data=>{
-      setabout(data)
+      if (isMounted) setabout(data);
     })
+    return () => {
+      isMounted = false;  // Cleanup on unmount
+    };
+  
   }, [])
   
 
@@ -29,7 +35,7 @@ const About = () => {
             className="app__profile-item"
             key={about.title + index}
           >
-            <img srcSet={about.imgUrl}  alt={about.title} />
+            <img srcSet={urlFor(about.imgUrl)}  alt={about.title} />
             <h2 className="bold-text" style={{ marginTop: 20 }}>{about.title}</h2>
             <p className="p-text" style={{ marginTop: 10 }}>{about.description}</p>
           </motion.div>
@@ -39,4 +45,4 @@ const About = () => {
   )
 };
 
-export default About;
+export default AppWrapper(About,'about');
